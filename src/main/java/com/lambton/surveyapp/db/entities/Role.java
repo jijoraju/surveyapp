@@ -3,6 +3,8 @@
  */
 package com.lambton.surveyapp.db.entities;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -23,7 +25,12 @@ import lombok.Setter;
 @Table(name = "master_role")
 @Getter
 @Setter
-public class Role extends BaseEntity {
+public class Role extends BaseEntity implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3351214824532863865L;
 	
 	@Enumerated(EnumType.STRING)
     private RoleType type;
