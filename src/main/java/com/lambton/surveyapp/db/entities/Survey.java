@@ -9,6 +9,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -36,6 +38,10 @@ public class Survey extends BaseEntity {
 	private String createdBy;
 	
 	private Date expiryDate;
+	
+	@ManyToMany(cascade=CascadeType.ALL)
+	@JoinTable(joinColumns = @JoinColumn(name = "survey_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+	private List<Tag> tags;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "survey_id")

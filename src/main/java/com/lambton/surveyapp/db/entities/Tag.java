@@ -13,15 +13,15 @@ import lombok.Setter;
 
 /**
  * @author Jijo Raju
- * @Since May 29, 2021 10:59:29 PM
+ * @Since Jun 5, 2021 11:23:05 AM
  *
  */
-@Entity
-@Table(name = "master_options")
 @Getter
 @Setter
-public class Option extends BaseEntity{
+@Entity
+@Table(name = "master_tag")
+public class Tag extends BaseEntity {
 	
-	private String value;
+	private String name;
 
 }

@@ -1,12 +1,12 @@
 server:
-  port: 8080
+  port: 5000
   
 
 spring:
   datasource:
-    username: root
-    password: root
-    url: jdbc:mysql://localhost:3306/survey-app?useSSL=false
+    username: survey_app_admin
+    password: SurveyAdminApp12345
+    url: jdbc:mysql://survey-app.cqh0az309wia.ap-south-1.rds.amazonaws.com:3306/survey-app?useSSL=false
     
   jpa:
     hibernate:
