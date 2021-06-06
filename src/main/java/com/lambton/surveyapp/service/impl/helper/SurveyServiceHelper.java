@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.management.RuntimeErrorException;
 
+import org.springframework.data.domain.Page;
 import org.springframework.util.StringUtils;
 
 import com.lambton.surveyapp.db.entities.Question;
@@ -18,6 +19,7 @@ import com.lambton.surveyapp.db.entities.Tag;
 import com.lambton.surveyapp.db.enums.AnswerType;
 import com.lambton.surveyapp.util.DateUtil;
 import com.lambton.surveyapp.view.models.QuestionVO;
+import com.lambton.surveyapp.view.models.SearchResultVO;
 import com.lambton.surveyapp.view.models.SurveyVO;
 
 /**
@@ -32,20 +34,7 @@ public interface SurveyServiceHelper {
 	 * @return
 	 */
 	static Survey getSurveyFromSurveyVO(SurveyVO surveyVO) {
-		Survey survey = new Survey();
-		survey.setName(surveyVO.getName());
-		survey.setDescription(surveyVO.getDescription());
-		if (StringUtils.hasLength(surveyVO.getExpiryDate())) {
-			survey.setExpiryDate(DateUtil.praseFromString(surveyVO.getExpiryDate(), "yyyy-MM-dd"));
-		}
-		else {
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(new Date());
-			calendar.add(Calendar.DAY_OF_YEAR, 7);
-			survey.setExpiryDate(calendar.getTime());
-		}
-		survey.setQuestions(getQuestionListFromQuestionVOList(surveyVO.getItems()));
-		return survey;
+		return getSurveyFromSurveyVO(new Survey(), surveyVO);
 	}
 
 	/**
@@ -81,12 +70,7 @@ public interface SurveyServiceHelper {
 	 */
 	static SurveyVO getSurveyVOFromSurvey(Survey survey) {
 		SurveyVO surveyVO = new SurveyVO();
-		surveyVO.setUniqueId(survey.getUniqueId());
-		surveyVO.setName(survey.getName());
-		surveyVO.setDescription(survey.getDescription());
-		surveyVO.setExpiryDate(DateUtil.toFormattedString(survey.getExpiryDate(), "yyyy-MM-dd"));
-		surveyVO.setTags(survey.getTags().stream().map(Tag::getName).collect(Collectors.joining(" ")));
-		surveyVO.setItems(getQuestionVOListFromQuestionList(survey.getQuestions()));
+		getSurveyVOFromSurvey(surveyVO, survey);
 		return surveyVO;
 	}
 
@@ -118,6 +102,52 @@ public interface SurveyServiceHelper {
 	 */
 	static List<SurveyVO> getSurveyVOListFromSurveyList(List<Survey> surveys) {
 		return surveys.stream().map(SurveyServiceHelper::getSurveyVOFromSurvey).collect(Collectors.toList());
+	}
+
+	/**
+	 * @param oldSurvey
+	 * @param surveyVO
+	 * @return
+	 */
+	static Survey getSurveyFromSurveyVO(Survey survey, SurveyVO surveyVO) {
+		survey.setName(surveyVO.getName());
+		survey.setDescription(surveyVO.getDescription());
+		if (StringUtils.hasText(surveyVO.getExpiryDate())) {
+			survey.setExpiryDate(DateUtil.praseFromString(surveyVO.getExpiryDate(), "yyyy-MM-dd"));
+		}
+		else {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(new Date());
+			calendar.add(Calendar.DAY_OF_YEAR, 7);
+			survey.setExpiryDate(calendar.getTime());
+		}
+		survey.setQuestions(getQuestionListFromQuestionVOList(surveyVO.getItems()));
+		return survey;
+	}
+
+	/**
+	 * @param updatedSurveyVO
+	 * @param updatedSurvey
+	 */
+	static void getSurveyVOFromSurvey(SurveyVO surveyVO, Survey survey) {
+		surveyVO.setUniqueId(survey.getUniqueId());
+		surveyVO.setName(survey.getName());
+		surveyVO.setDescription(survey.getDescription());
+		surveyVO.setExpiryDate(DateUtil.toFormattedString(survey.getExpiryDate(), "yyyy-MM-dd"));
+		surveyVO.setTags(survey.getTags().stream().map(Tag::getName).collect(Collectors.joining(" ")));
+		surveyVO.setItems(getQuestionVOListFromQuestionList(survey.getQuestions()));
+	}
+
+	/**
+	 * @param survays
+	 * @return
+	 */
+	static SearchResultVO<SurveyVO> getSurveyVOListFromSurveyPages(Page<Survey> survays) {
+		SearchResultVO<SurveyVO> searchResult = new SearchResultVO<>();
+		searchResult.getSearchResult().addAll(survays.getContent().stream()
+				.map(SurveyServiceHelper::getSurveyVOFromSurvey).collect(Collectors.toList()));
+		searchResult.setLastPage(survays.isLast());
+		return searchResult;
 	}
 
 }

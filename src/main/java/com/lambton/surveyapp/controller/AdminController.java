@@ -4,6 +4,7 @@
 package com.lambton.surveyapp.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lambton.surveyapp.service.SurveyService;
+import com.lambton.surveyapp.view.models.SearchResultVO;
 import com.lambton.surveyapp.view.models.SurveyVO;
 
 /**
@@ -34,6 +36,11 @@ public class AdminController {
 		return surveyService.getAll();
 	}
 
+	@GetMapping("/survey/search")
+	public SearchResultVO<SurveyVO> findAllSurveys(@RequestParam Map<String, String> params) {
+		return surveyService.search(params);
+	}
+
 	@GetMapping("/survey/get")
 	public SurveyVO createSurvey(@RequestParam String surveyId) {
 		return surveyService.findOne(surveyId);
@@ -42,6 +49,11 @@ public class AdminController {
 	@PostMapping("/survey/create")
 	public SurveyVO createSurvey(@RequestBody SurveyVO surveyVO) {
 		return surveyService.save(surveyVO);
+	}
+
+	@PostMapping("/survey/update")
+	public SurveyVO updateSurvey(@RequestBody SurveyVO surveyVO) {
+		return surveyService.update(surveyVO);
 	}
 
 }
