@@ -5,23 +5,34 @@ package com.lambton.surveyapp.service.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.lambton.surveyapp.db.entities.Survey;
 import com.lambton.surveyapp.db.entities.Tag;
+import com.lambton.surveyapp.db.query.CommonSearchSpecification;
+import com.lambton.surveyapp.db.query.SearchCriteria;
+import com.lambton.surveyapp.db.query.SearchOperation;
 import com.lambton.surveyapp.db.repository.SurveyRepository;
 import com.lambton.surveyapp.db.repository.TagRepository;
 import com.lambton.surveyapp.service.SurveyService;
 import com.lambton.surveyapp.service.impl.helper.SurveyServiceHelper;
+import com.lambton.surveyapp.util.DateUtil;
+import com.lambton.surveyapp.view.models.SearchResultVO;
 import com.lambton.surveyapp.view.models.SurveyVO;
 
 /**
@@ -43,13 +54,14 @@ public class SurveyServiceImpl implements SurveyService {
 	public List<SurveyVO> getAll() {
 		return SurveyServiceHelper.getSurveyVOListFromSurveyList(surveyRepository.findAll());
 	}
-	
+
 	@Override
 	public SurveyVO findOne(String uniqueId) {
 		Optional<Survey> survey = surveyRepository.findByUniqueId(uniqueId);
-		if(survey.isPresent()) {
+		if (survey.isPresent()) {
 			return SurveyServiceHelper.getSurveyVOFromSurvey(survey.get());
-		}else {
+		}
+		else {
 			throw new RuntimeErrorException(new Error("Survey not available"));
 		}
 	}
@@ -65,12 +77,74 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Override
 	public SurveyVO update(SurveyVO surveyVO) {
-		return null;
+		SurveyVO updatedSurveyVO = new SurveyVO();
+		if (StringUtils.hasText(surveyVO.getUniqueId())) {
+
+			surveyRepository.findByUniqueId(surveyVO.getUniqueId()).ifPresent(oldSurvey -> {
+				Survey updatedSurvey = surveyRepository
+						.save(SurveyServiceHelper.getSurveyFromSurveyVO(oldSurvey, surveyVO));
+				SurveyServiceHelper.getSurveyVOFromSurvey(updatedSurveyVO, updatedSurvey);
+			});
+		}
+		if (StringUtils.hasText(updatedSurveyVO.getUniqueId()))
+			return updatedSurveyVO;
+		else
+			throw new RuntimeErrorException(new Error("Update failed"));
 	}
 
 	@Override
 	public Void delete(SurveyVO surveyVO) {
+		try {
+			if (StringUtils.hasText(surveyVO.getUniqueId())) {
+				surveyRepository.findByUniqueId(surveyVO.getUniqueId()).ifPresent(surveyRepository::delete);
+			}
+		}
+		catch (Exception e) {
+			throw new RuntimeErrorException(new Error("Delete failed"));
+		}
 		return null;
+	}
+
+	@Override
+	public SearchResultVO<SurveyVO> search(Map<String, String> params) {
+		try {
+			int pageNo;
+			if (StringUtils.hasText(params.get("pageNo")))
+				pageNo = Integer.parseInt(params.get("pageNo"));
+			else
+				pageNo = 0;
+			Pageable pageable = PageRequest.of(pageNo, 10);
+			CommonSearchSpecification<Survey> surveySpec = new CommonSearchSpecification<>();
+
+			populateDateRangeSearchSpecification(surveySpec, params.get("dateRange"));
+			if (StringUtils.hasText(params.get("searchKey"))) {
+				surveySpec.add(new SearchCriteria("name", params.get("searchKey"), SearchOperation.MATCH));
+				surveySpec.add(new SearchCriteria("description", params.get("searchKey"), SearchOperation.MATCH));
+			}
+			if (StringUtils.hasText(params.get("uniqueId"))) {
+				surveySpec.add(new SearchCriteria("uniqueId", params.get("surveyId"), SearchOperation.MATCH));
+			}
+			Page<Survey> survays = surveyRepository.findAll(surveySpec, pageable);
+			return SurveyServiceHelper.getSurveyVOListFromSurveyPages(survays);
+		}
+		catch (Exception e) {
+			throw new RuntimeErrorException(new Error("search failed"));
+		}
+	}
+
+	/**
+	 * @param examSepcification
+	 * @param string
+	 */
+	private void populateDateRangeSearchSpecification(CommonSearchSpecification<Survey> examSepcification,
+			String dateRange) {
+		if (StringUtils.hasText(dateRange) && dateRange.contains("|")) {
+			String[] dates = dateRange.split(Pattern.quote("|"));
+			Date[] dateValues = new Date[2];
+			dateValues[0] = DateUtil.praseFromString(dates[0], "yyyy-MM-dd");
+			dateValues[1] = DateUtil.praseFromString(dates[1], "yyyy-MM-dd");
+			examSepcification.add(new SearchCriteria("expiryDate", dateValues, SearchOperation.BETWEEN));
+		}
 	}
 
 	/**
@@ -96,7 +170,5 @@ public class SurveyServiceImpl implements SurveyService {
 		}
 		return Collections.emptyList();
 	}
-
-	
 
 }

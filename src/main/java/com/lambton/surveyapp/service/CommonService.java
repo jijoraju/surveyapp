@@ -4,6 +4,10 @@
 package com.lambton.surveyapp.service;
 
 import java.util.List;
+import java.util.Map;
+
+import com.lambton.surveyapp.view.models.SearchResultVO;
+import com.lambton.surveyapp.view.models.SurveyVO;
 
 /**
  * @author Jijo Raju
@@ -13,7 +17,7 @@ import java.util.List;
 public interface CommonService<T> {
 
 	List<T> getAll();
-	
+
 	T findOne(String uniqueId);
 
 	T save(T object);
@@ -21,5 +25,7 @@ public interface CommonService<T> {
 	T update(T object);
 
 	Void delete(T object);
+
+	SearchResultVO<SurveyVO> search(Map<String, String> params);
 
 }
