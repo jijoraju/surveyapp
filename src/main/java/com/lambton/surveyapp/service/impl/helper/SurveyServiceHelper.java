@@ -3,6 +3,7 @@
  */
 package com.lambton.surveyapp.service.impl.helper;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.management.RuntimeErrorException;
 
 import org.springframework.data.domain.Page;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.lambton.surveyapp.db.entities.Question;
@@ -38,19 +40,32 @@ public interface SurveyServiceHelper {
 	}
 
 	/**
+	 * @param oldQuestions
 	 * @param questionItems
 	 * @return
 	 */
-	static List<Question> getQuestionListFromQuestionVOList(List<QuestionVO> questionItems) {
-		return questionItems.stream().map(SurveyServiceHelper::getQuestionFromQuestionVO).collect(Collectors.toList());
+	static List<Question> updateQuestionListFromQuestionVOList(List<Question> oldQuestions,
+			List<QuestionVO> questionItems) {
+
+		List<Question> updatedQuestons = new ArrayList<>();
+		questionItems.stream().forEach(questionToUpdate -> oldQuestions.stream()
+				.filter(oldQuestion -> StringUtils.hasText(questionToUpdate.getUniqueId())
+						&& questionToUpdate.getUniqueId().equals(oldQuestion.getUniqueId()))
+				.findFirst().ifPresentOrElse(
+						oldQuestion -> updatedQuestons.add(getQuestionFromQuestionVO(oldQuestion, questionToUpdate)),
+						() -> updatedQuestons.add(getQuestionFromQuestionVO(questionToUpdate))));
+		if (CollectionUtils.isEmpty(updatedQuestons)) {
+			throw new RuntimeErrorException(new Error("Invalid Update"));
+		}
+		return updatedQuestons;
 	}
 
 	/**
-	 * @param item
+	 * @param oldQuestion
+	 * @param questionToUpdate
 	 * @return
 	 */
-	static Question getQuestionFromQuestionVO(QuestionVO item) {
-		Question question = new Question();
+	static Question getQuestionFromQuestionVO(Question question, QuestionVO item) {
 		question.setTitle(item.getQuestion());
 		question.setDescription(item.getDescription());
 		question.setOptionItems(item.getOptionItems());
@@ -62,6 +77,14 @@ public interface SurveyServiceHelper {
 			question.setAnswerType(ansType);
 		}
 		return question;
+	}
+
+	/**
+	 * @param item
+	 * @return
+	 */
+	static Question getQuestionFromQuestionVO(QuestionVO item) {
+		return getQuestionFromQuestionVO(new Question(), item);
 	}
 
 	/**
@@ -121,7 +144,7 @@ public interface SurveyServiceHelper {
 			calendar.add(Calendar.DAY_OF_YEAR, 7);
 			survey.setExpiryDate(calendar.getTime());
 		}
-		survey.setQuestions(getQuestionListFromQuestionVOList(surveyVO.getItems()));
+		survey.setQuestions(updateQuestionListFromQuestionVOList(survey.getQuestions(), surveyVO.getItems()));
 		return survey;
 	}
 

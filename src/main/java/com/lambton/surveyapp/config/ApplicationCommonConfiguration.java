@@ -25,17 +25,13 @@ public class ApplicationCommonConfiguration {
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
 
-	@Bean
-	public CorsFilter corsFilter() {
-		UrlBasedCorsConfigurationSource configSource = new UrlBasedCorsConfigurationSource();
-		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.setAllowCredentials(true);
-		corsConfiguration.addAllowedOrigin("*");
-		corsConfiguration.addAllowedHeader("*");
-		corsConfiguration.addAllowedMethod("GET");
-		corsConfiguration.addAllowedMethod("POST");
-		configSource.registerCorsConfiguration("/**", corsConfiguration);
-		return new CorsFilter(configSource);
-	}
+	/*
+	 * @Bean public CorsFilter corsFilter() { UrlBasedCorsConfigurationSource configSource = new
+	 * UrlBasedCorsConfigurationSource(); CorsConfiguration corsConfiguration = new CorsConfiguration();
+	 * corsConfiguration.setAllowCredentials(true); corsConfiguration.addAllowedOrigin("*");
+	 * corsConfiguration.addAllowedHeader("*"); corsConfiguration.addAllowedMethod("GET");
+	 * corsConfiguration.addAllowedMethod("POST"); configSource.registerCorsConfiguration("/**", corsConfiguration);
+	 * return new CorsFilter(configSource); }
+	 */
 
 }

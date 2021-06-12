@@ -81,9 +81,11 @@ public class SurveyServiceImpl implements SurveyService {
 		if (StringUtils.hasText(surveyVO.getUniqueId())) {
 
 			surveyRepository.findByUniqueId(surveyVO.getUniqueId()).ifPresent(oldSurvey -> {
-				Survey updatedSurvey = surveyRepository
-						.save(SurveyServiceHelper.getSurveyFromSurveyVO(oldSurvey, surveyVO));
-				SurveyServiceHelper.getSurveyVOFromSurvey(updatedSurveyVO, updatedSurvey);
+				Survey surveyToUpdate = SurveyServiceHelper.getSurveyFromSurveyVO(oldSurvey, surveyVO);
+				surveyToUpdate.setTags(getTagList(surveyVO.getTags()));
+				surveyToUpdate.getQuestions().stream().filter(question -> !StringUtils.hasText(question.getUniqueId()))
+						.forEach(newQuestion -> newQuestion.setUniqueId(UUID.randomUUID().toString()));
+				SurveyServiceHelper.getSurveyVOFromSurvey(updatedSurveyVO, surveyRepository.save(surveyToUpdate));
 			});
 		}
 		if (StringUtils.hasText(updatedSurveyVO.getUniqueId()))
