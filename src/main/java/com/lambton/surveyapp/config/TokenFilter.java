@@ -33,9 +33,8 @@ import com.lambton.surveyapp.db.repository.UserRepository;
 @Component
 public class TokenFilter extends OncePerRequestFilter {
 
-	private String issuer = "Lampton";
-
-	private String secretKey = "LamptonSecret";
+	@Autowired
+	private TokenUtil tokenUtil;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -51,13 +50,12 @@ public class TokenFilter extends OncePerRequestFilter {
 		}
 
 		token = token.replace("Bearer ", "");
-		if (!TokenUtil.validateToken(token, issuer, secretKey)) {
+		if (!tokenUtil.validateToken(token)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
-		UserDetails userDetails = userRepository.findByUsername(TokenUtil.getUsername(token, issuer, secretKey))
-				.orElse(null);
+		UserDetails userDetails = userRepository.findByUsername(tokenUtil.getUsername(token)).orElse(null);
 		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
 				ofNullable(userDetails).map(UserDetails::getAuthorities).orElse(of()));
 		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

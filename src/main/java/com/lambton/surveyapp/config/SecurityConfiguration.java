@@ -37,6 +37,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private TokenFilter tockenFilter;
 
+	private static final String[] AUTH_WHITELIST = {
+			// -- Swagger UI v2
+			"/v2/api-docs", "/swagger-resources", "/swagger-resources/**", "/configuration/ui",
+			"/configuration/security", "/swagger-ui.html", "/webjars/**",
+			// -- Swagger UI v3 (OpenAPI)
+			"/v3/api-docs/**", "/swagger-ui/**",
+			// other public endpoints
+			"/auth/login", "/auth/signup" };
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(username -> userRepository.findByUsername(username)
@@ -50,7 +59,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.and().exceptionHandling()
 				.authenticationEntryPoint(
 						(req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage()))
-				.and().authorizeRequests().antMatchers("/**").permitAll();
+				.and().authorizeRequests().antMatchers(AUTH_WHITELIST).permitAll().anyRequest().authenticated();
 
 		http.addFilterBefore(tockenFilter, UsernamePasswordAuthenticationFilter.class);
 	}

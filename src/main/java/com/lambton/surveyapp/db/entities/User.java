@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -17,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lambton.surveyapp.db.entities.common.BaseEntity;
 
 import lombok.Getter;
@@ -41,6 +43,7 @@ public class User extends BaseEntity implements UserDetails {
 
 	private String username;
 
+	@JsonIgnore
 	private String password;
 
 	private String email;
@@ -57,7 +60,7 @@ public class User extends BaseEntity implements UserDetails {
 
 	private boolean isEnabled;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles;
 

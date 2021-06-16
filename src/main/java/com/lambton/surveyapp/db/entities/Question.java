@@ -29,8 +29,10 @@ public class Question extends BaseEntity {
 
 	private AnswerType answerType;
 
+	@Column(length = 100000)
 	private String title;
 
+	@Column(length = 100000)
 	private String description;
 
 	@ElementCollection

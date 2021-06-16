@@ -17,7 +17,6 @@ import org.springframework.util.StringUtils;
 
 import com.lambton.surveyapp.db.entities.Question;
 import com.lambton.surveyapp.db.entities.Survey;
-import com.lambton.surveyapp.db.entities.Tag;
 import com.lambton.surveyapp.db.enums.AnswerType;
 import com.lambton.surveyapp.util.DateUtil;
 import com.lambton.surveyapp.view.models.QuestionVO;
@@ -44,20 +43,30 @@ public interface SurveyServiceHelper {
 	 * @param questionItems
 	 * @return
 	 */
-	static List<Question> updateQuestionListFromQuestionVOList(List<Question> oldQuestions,
-			List<QuestionVO> questionItems) {
+	static List<Question> getQuestionListFromQuestionVOList(List<QuestionVO> questionItems,
+			List<Question> oldQuestions) {
 
-		List<Question> updatedQuestons = new ArrayList<>();
-		questionItems.stream().forEach(questionToUpdate -> oldQuestions.stream()
-				.filter(oldQuestion -> StringUtils.hasText(questionToUpdate.getUniqueId())
-						&& questionToUpdate.getUniqueId().equals(oldQuestion.getUniqueId()))
-				.findFirst().ifPresentOrElse(
-						oldQuestion -> updatedQuestons.add(getQuestionFromQuestionVO(oldQuestion, questionToUpdate)),
-						() -> updatedQuestons.add(getQuestionFromQuestionVO(questionToUpdate))));
-		if (CollectionUtils.isEmpty(updatedQuestons)) {
-			throw new RuntimeErrorException(new Error("Invalid Update"));
+		if (CollectionUtils.isEmpty(oldQuestions) && !CollectionUtils.isEmpty(questionItems)) {
+			return questionItems.stream().map(SurveyServiceHelper::getQuestionFromQuestionVO)
+					.collect(Collectors.toList());
 		}
-		return updatedQuestons;
+		else {
+			List<Question> updatedQuestons = new ArrayList<>();
+			if (null != questionItems) {
+				questionItems.stream()
+						.forEach(questionToUpdate -> oldQuestions.stream()
+								.filter(oldQuestion -> StringUtils.hasText(questionToUpdate.getUniqueId())
+										&& questionToUpdate.getUniqueId().equals(oldQuestion.getUniqueId()))
+								.findFirst().ifPresentOrElse(
+										oldQuestion -> updatedQuestons
+												.add(getQuestionFromQuestionVO(oldQuestion, questionToUpdate)),
+										() -> updatedQuestons.add(getQuestionFromQuestionVO(questionToUpdate))));
+			}
+			if (CollectionUtils.isEmpty(updatedQuestons)) {
+				throw new RuntimeErrorException(new Error("Invalid Update"));
+			}
+			return updatedQuestons;
+		}
 	}
 
 	/**
@@ -144,8 +153,22 @@ public interface SurveyServiceHelper {
 			calendar.add(Calendar.DAY_OF_YEAR, 7);
 			survey.setExpiryDate(calendar.getTime());
 		}
-		survey.setQuestions(updateQuestionListFromQuestionVOList(survey.getQuestions(), surveyVO.getItems()));
+		if (StringUtils.hasText(survey.getUniqueId())) {
+			survey.setQuestions(getQuestionListFromQuestionVOList(surveyVO.getItems(), survey.getQuestions()));
+		}
+		else {
+			survey.setQuestions(getQuestionListFromQuestionVOList(surveyVO.getItems()));
+		}
+
 		return survey;
+	}
+
+	/**
+	 * @param items
+	 * @return
+	 */
+	static List<Question> getQuestionListFromQuestionVOList(List<QuestionVO> questionItems) {
+		return getQuestionListFromQuestionVOList(questionItems, null);
 	}
 
 	/**
@@ -157,7 +180,7 @@ public interface SurveyServiceHelper {
 		surveyVO.setName(survey.getName());
 		surveyVO.setDescription(survey.getDescription());
 		surveyVO.setExpiryDate(DateUtil.toFormattedString(survey.getExpiryDate(), "yyyy-MM-dd"));
-		surveyVO.setTags(survey.getTags().stream().map(Tag::getName).collect(Collectors.joining(" ")));
+		surveyVO.setTags(survey.getTags().stream().collect(Collectors.joining(" ")));
 		surveyVO.setItems(getQuestionVOListFromQuestionList(survey.getQuestions()));
 	}
 

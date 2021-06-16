@@ -1,6 +1,12 @@
 server:
   port: 5000
   
+overseas:
+  app:
+   jwt:
+    issuer: "overseasapp"
+    secret.key: "overseassecret"
+  
 
 spring:
   datasource:

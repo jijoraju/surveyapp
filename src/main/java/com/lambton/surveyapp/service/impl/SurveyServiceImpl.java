@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.management.RuntimeErrorException;
 
@@ -98,7 +99,13 @@ public class SurveyServiceImpl implements SurveyService {
 	public Void delete(SurveyVO surveyVO) {
 		try {
 			if (StringUtils.hasText(surveyVO.getUniqueId())) {
-				surveyRepository.findByUniqueId(surveyVO.getUniqueId()).ifPresent(surveyRepository::delete);
+				Optional<Survey> surveyToDelete = surveyRepository.findByUniqueId(surveyVO.getUniqueId());
+				if (surveyToDelete.isPresent()) {
+					surveyRepository.delete(surveyToDelete.get());
+				}
+				else {
+					throw new RuntimeErrorException(new Error("Delete failed"));
+				}
 			}
 		}
 		catch (Exception e) {
@@ -153,7 +160,7 @@ public class SurveyServiceImpl implements SurveyService {
 	 * @param tags
 	 * @return
 	 */
-	private List<Tag> getTagList(String tags) {
+	private List<String> getTagList(String tags) {
 		if (StringUtils.hasLength(tags)) {
 			List<String> surveyTags = new LinkedList<>(Arrays.asList(tags.split(" ")));
 			List<Tag> existingTags = tagRepository.findAllNameIn(surveyTags);
@@ -162,13 +169,15 @@ public class SurveyServiceImpl implements SurveyService {
 					surveyTags.remove(tag.getName());
 				}
 			});
-			surveyTags.stream().forEach(name -> {
+			List<Tag> newTags = surveyTags.stream().map(name -> {
 				Tag tag = new Tag();
 				tag.setName(name);
 				tag.setUniqueId(UUID.randomUUID().toString());
 				existingTags.add(tag);
-			});
-			return existingTags;
+				return tag;
+			}).collect(Collectors.toList());
+			tagRepository.saveAll(newTags);
+			return existingTags.stream().map(Tag::getName).collect(Collectors.toList());
 		}
 		return Collections.emptyList();
 	}
