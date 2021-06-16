@@ -3,6 +3,7 @@
  */
 package com.lambton.surveyapp.service.impl.helper;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -11,11 +12,11 @@ import java.util.stream.Collectors;
 import javax.management.RuntimeErrorException;
 
 import org.springframework.data.domain.Page;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.lambton.surveyapp.db.entities.Question;
 import com.lambton.surveyapp.db.entities.Survey;
-import com.lambton.surveyapp.db.entities.Tag;
 import com.lambton.surveyapp.db.enums.AnswerType;
 import com.lambton.surveyapp.util.DateUtil;
 import com.lambton.surveyapp.view.models.QuestionVO;
@@ -38,19 +39,42 @@ public interface SurveyServiceHelper {
 	}
 
 	/**
+	 * @param oldQuestions
 	 * @param questionItems
 	 * @return
 	 */
-	static List<Question> getQuestionListFromQuestionVOList(List<QuestionVO> questionItems) {
-		return questionItems.stream().map(SurveyServiceHelper::getQuestionFromQuestionVO).collect(Collectors.toList());
+	static List<Question> getQuestionListFromQuestionVOList(List<QuestionVO> questionItems,
+			List<Question> oldQuestions) {
+
+		if (CollectionUtils.isEmpty(oldQuestions) && !CollectionUtils.isEmpty(questionItems)) {
+			return questionItems.stream().map(SurveyServiceHelper::getQuestionFromQuestionVO)
+					.collect(Collectors.toList());
+		}
+		else {
+			List<Question> updatedQuestons = new ArrayList<>();
+			if (null != questionItems) {
+				questionItems.stream()
+						.forEach(questionToUpdate -> oldQuestions.stream()
+								.filter(oldQuestion -> StringUtils.hasText(questionToUpdate.getUniqueId())
+										&& questionToUpdate.getUniqueId().equals(oldQuestion.getUniqueId()))
+								.findFirst().ifPresentOrElse(
+										oldQuestion -> updatedQuestons
+												.add(getQuestionFromQuestionVO(oldQuestion, questionToUpdate)),
+										() -> updatedQuestons.add(getQuestionFromQuestionVO(questionToUpdate))));
+			}
+			if (CollectionUtils.isEmpty(updatedQuestons)) {
+				throw new RuntimeErrorException(new Error("Invalid Update"));
+			}
+			return updatedQuestons;
+		}
 	}
 
 	/**
-	 * @param item
+	 * @param oldQuestion
+	 * @param questionToUpdate
 	 * @return
 	 */
-	static Question getQuestionFromQuestionVO(QuestionVO item) {
-		Question question = new Question();
+	static Question getQuestionFromQuestionVO(Question question, QuestionVO item) {
 		question.setTitle(item.getQuestion());
 		question.setDescription(item.getDescription());
 		question.setOptionItems(item.getOptionItems());
@@ -62,6 +86,14 @@ public interface SurveyServiceHelper {
 			question.setAnswerType(ansType);
 		}
 		return question;
+	}
+
+	/**
+	 * @param item
+	 * @return
+	 */
+	static Question getQuestionFromQuestionVO(QuestionVO item) {
+		return getQuestionFromQuestionVO(new Question(), item);
 	}
 
 	/**
@@ -121,8 +153,22 @@ public interface SurveyServiceHelper {
 			calendar.add(Calendar.DAY_OF_YEAR, 7);
 			survey.setExpiryDate(calendar.getTime());
 		}
-		survey.setQuestions(getQuestionListFromQuestionVOList(surveyVO.getItems()));
+		if (StringUtils.hasText(survey.getUniqueId())) {
+			survey.setQuestions(getQuestionListFromQuestionVOList(surveyVO.getItems(), survey.getQuestions()));
+		}
+		else {
+			survey.setQuestions(getQuestionListFromQuestionVOList(surveyVO.getItems()));
+		}
+
 		return survey;
+	}
+
+	/**
+	 * @param items
+	 * @return
+	 */
+	static List<Question> getQuestionListFromQuestionVOList(List<QuestionVO> questionItems) {
+		return getQuestionListFromQuestionVOList(questionItems, null);
 	}
 
 	/**
@@ -134,7 +180,7 @@ public interface SurveyServiceHelper {
 		surveyVO.setName(survey.getName());
 		surveyVO.setDescription(survey.getDescription());
 		surveyVO.setExpiryDate(DateUtil.toFormattedString(survey.getExpiryDate(), "yyyy-MM-dd"));
-		surveyVO.setTags(survey.getTags().stream().map(Tag::getName).collect(Collectors.joining(" ")));
+		surveyVO.setTags(survey.getTags().stream().collect(Collectors.joining(" ")));
 		surveyVO.setItems(getQuestionVOListFromQuestionList(survey.getQuestions()));
 	}
 

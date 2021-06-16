@@ -55,5 +55,9 @@ public class AdminController {
 	public SurveyVO updateSurvey(@RequestBody SurveyVO surveyVO) {
 		return surveyService.update(surveyVO);
 	}
-
+	
+	@PostMapping("/survey/delete")
+	public Void deleteSurvey(@RequestBody SurveyVO surveyVO) {
+		return surveyService.delete(surveyVO);
+	}
 }

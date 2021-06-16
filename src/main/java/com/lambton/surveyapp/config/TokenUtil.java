@@ -5,6 +5,9 @@ package com.lambton.surveyapp.config;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -17,9 +20,16 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
  *
  */
 
-public interface TokenUtil {
+@Component
+public class TokenUtil {
 
-	public static String createAuthorizationToken(String id, String username, String issuer, String secretKey) {
+	@Value("${overseas.app.jwt.issuer}")
+	private String issuer;
+
+	@Value("${overseas.app.jwt.secret.key}")
+	private String secretKey;
+
+	public String createAuthorizationToken(String id, String username) {
 		try {
 			return JWT.create().withSubject(username).withClaim("id", id).withIssuedAt(new Date())
 					.withExpiresAt(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)).withIssuer(issuer)
@@ -31,7 +41,7 @@ public interface TokenUtil {
 		}
 	}
 
-	public static boolean validateToken(String token, String issuer, String secretKey) {
+	public boolean validateToken(String token) {
 		try {
 			JWTVerifier verifier = JWT.require(Algorithm.HMAC512(secretKey)).withIssuer(issuer).build();
 			verifier.verify(token);
@@ -43,7 +53,7 @@ public interface TokenUtil {
 		}
 	}
 
-	public static String getUsername(String token, String issuer, String secretKey) {
+	public String getUsername(String token) {
 		return JWT.require(Algorithm.HMAC512(secretKey)).withIssuer(issuer).build().verify(token).getSubject();
 	}
 

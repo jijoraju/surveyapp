@@ -7,13 +7,15 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.lambton.surveyapp.annotation.CurrentUser;
 import com.lambton.surveyapp.db.entities.common.BaseEntity;
 
 import lombok.Getter;
@@ -31,17 +33,21 @@ import lombok.Setter;
 @Setter
 public class Survey extends BaseEntity {
 	
+	@Column(length = 100000)
 	private String name;
 	
+	@Column(length = 1000000)
 	private String description;
 	
-	private String createdBy;
+	@CurrentUser
+	private User createdBy;
 	
 	private Date expiryDate;
 	
-	@ManyToMany(cascade=CascadeType.ALL)
-	@JoinTable(joinColumns = @JoinColumn(name = "survey_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-	private List<Tag> tags;
+	@ElementCollection
+	@CollectionTable(name = "survey_tags", joinColumns = @JoinColumn(name = "survey_id"))
+	@Column(name = "tags")
+	private List<String> tags;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "survey_id")
