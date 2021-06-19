@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.lambton.surveyapp.view.models.SearchResultVO;
-import com.lambton.surveyapp.view.models.SurveyVO;
 
 /**
  * @author Jijo Raju
@@ -26,6 +25,6 @@ public interface CommonService<T> {
 
 	Void delete(T object);
 
-	SearchResultVO<SurveyVO> search(Map<String, String> params);
+	SearchResultVO<T> search(Map<String, String> params);
 
 }

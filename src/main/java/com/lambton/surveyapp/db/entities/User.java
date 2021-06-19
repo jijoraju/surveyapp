@@ -51,6 +51,10 @@ public class User extends BaseEntity implements UserDetails {
 	private String firstName;
 
 	private String lastname;
+	
+	private String address;
+	
+	private String phoneNumber;
 
 	private boolean isAccountNonExpired;
 

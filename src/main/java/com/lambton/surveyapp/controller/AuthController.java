@@ -34,7 +34,9 @@ public class AuthController {
 	public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthRequest request) {
 		try {
 			AuthResponse authRes = authService.authenticate(request);
-			return ResponseEntity.ok(authRes);
+			return ResponseEntity.ok()
+					.header("Set-Cookie", "JSESSIONID=" + authRes.getToken() + "; Max-Age=604800; Secure; HttpOnly")
+					.body(authRes);
 		}
 		catch (BadCredentialsException ex) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

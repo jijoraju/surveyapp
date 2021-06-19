@@ -18,7 +18,7 @@ import com.lambton.surveyapp.db.entities.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-	
+
 	Optional<User> findByUsername(String username);
 
 	/**
@@ -26,5 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	 * @return
 	 */
 	boolean existsByEmail(String email);
+
+	Optional<User> findByUniqueId(String uniqueId);
 
 }
