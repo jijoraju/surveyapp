@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.management.RuntimeErrorException;
 
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.lambton.surveyapp.db.entities.Survey;
@@ -176,7 +178,9 @@ public class SurveyServiceImpl implements SurveyService {
 				existingTags.add(tag);
 				return tag;
 			}).collect(Collectors.toList());
-			tagRepository.saveAll(newTags);
+			if (!CollectionUtils.isEmpty(newTags)) {
+				tagRepository.saveAll(newTags);
+			}
 			return existingTags.stream().map(Tag::getName).collect(Collectors.toList());
 		}
 		return Collections.emptyList();

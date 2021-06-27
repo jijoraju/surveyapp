@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.WebUtils;
 
 import com.lambton.surveyapp.db.repository.UserRepository;
 
@@ -44,7 +46,13 @@ public class TokenFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-		if (!hasLength(token) || !token.startsWith("Bearer ")) {
+		if (!hasLength(token) || token.startsWith("Bearer ") || token.length() <= 7) {
+			Cookie c = WebUtils.getCookie(request, "JSESSIONID");
+			if (null != c && null != c.getValue()) {
+				token = c.getValue();
+			}
+		}
+		if(!hasLength(token)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
