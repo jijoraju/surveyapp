@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.lambton.surveyapp.config.TokenUtil;
 import com.lambton.surveyapp.db.entities.Role;
@@ -20,6 +21,7 @@ import com.lambton.surveyapp.db.repository.RoleRepository;
 import com.lambton.surveyapp.db.repository.UserRepository;
 import com.lambton.surveyapp.service.AuthService;
 import com.lambton.surveyapp.service.impl.helper.AuthServiceHelper;
+import com.lambton.surveyapp.util.StringUtil;
 import com.lambton.surveyapp.view.models.AuthRequest;
 import com.lambton.surveyapp.view.models.AuthResponse;
 import com.lambton.surveyapp.view.models.SignUpRequest;
@@ -39,22 +41,22 @@ public class AuthServiceImpl implements AuthService {
 
 	@Autowired
 	private TokenUtil tokenUtil;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private PasswordEncoder encoder;
-	
+
 	@Autowired
 	private RoleRepository roleRepository;
 
 	@Override
 	public SignUpResponse signup(SignUpRequest signUpRequest) {
-		
-		if(userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return new SignUpResponse(false, "Email Address already in use!");
-        }
+
+		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+			return new SignUpResponse(false, "Email Address already in use!");
+		}
 		User user = AuthServiceHelper.getUserFromSignUpRequest(signUpRequest);
 		user.setPassword(encoder.encode(signUpRequest.getPassword()));
 		Role role = roleRepository.findByType(RoleType.ROLE_USER);
@@ -65,12 +67,13 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public AuthResponse authenticate(AuthRequest authRequest) {
-		
+
 		Authentication auth = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
 		User user = (User) auth.getPrincipal();
+		String role = StringUtil.capitalize(user.getRoles().iterator().next().getType().name().replace("ROLE_", ""));
 		return new AuthResponse(user.getUsername(),
-				tokenUtil.createAuthorizationToken(user.getUniqueId(), user.getUsername()));
+				tokenUtil.createAuthorizationToken(user.getUniqueId(), user.getUsername()), role);
 	}
 
 }
