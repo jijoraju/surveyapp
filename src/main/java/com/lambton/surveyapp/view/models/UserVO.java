@@ -3,7 +3,6 @@
  */
 package com.lambton.surveyapp.view.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
