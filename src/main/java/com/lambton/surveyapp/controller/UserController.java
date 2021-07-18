@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lambton.surveyapp.service.UserService;
+import com.lambton.surveyapp.view.models.SurveyResponseVO;
+import com.lambton.surveyapp.view.models.SurveyResultVO;
+import com.lambton.surveyapp.view.models.UserAnalyticsVO;
 import com.lambton.surveyapp.view.models.UserVO;
 
 
@@ -35,6 +38,16 @@ public class UserController {
 	@PostMapping("/user/profile/update")
 	public UserVO updateUserProfile(@RequestBody UserVO userVO) {
 		return userService.updateProfile(userVO);
+	}
+	
+	@PostMapping("/user/survey/submit")
+	public SurveyResultVO submitSurveyResponse(@RequestBody SurveyResponseVO surveyResponseVO) {
+		return userService.submitSurveyResponse(surveyResponseVO);
+	}
+	
+	@GetMapping("/user/anylytics")
+	public UserAnalyticsVO getUserAnalytics() {
+		return userService.getUserAnalytics();
 	}
 
 }

@@ -24,6 +24,8 @@ public class SurveyVO {
 	
 	private String description;
 	
+	private String startDate;
+	
 	private String expiryDate;
 	
 	private String tags;

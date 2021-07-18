@@ -3,6 +3,8 @@
  */
 package com.lambton.surveyapp.service;
 
+import java.util.List;
+
 import com.lambton.surveyapp.view.models.SurveyVO;
 
 /**
@@ -11,5 +13,9 @@ import com.lambton.surveyapp.view.models.SurveyVO;
  *
  */
 public interface SurveyService extends CommonService<SurveyVO> {
+
+	List<SurveyVO> getAllBeforeEndDate();
+
+	List<SurveyVO> getAllBeforeStartDate();
 
 }

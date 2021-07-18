@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lambton.surveyapp.service.AdminService;
 import com.lambton.surveyapp.service.SurveyService;
+import com.lambton.surveyapp.view.models.AdminAnalyticsVO;
 import com.lambton.surveyapp.view.models.SearchResultVO;
 import com.lambton.surveyapp.view.models.SurveyVO;
 
@@ -27,13 +29,21 @@ import com.lambton.surveyapp.view.models.SurveyVO;
 @RestController
 @RequestMapping("/surveyapp")
 public class AdminController {
-
+	
 	@Autowired
 	private SurveyService surveyService;
+	
+	@Autowired
+	private AdminService adminService;
 
-	@GetMapping("/survey/all")
+	@GetMapping("/survey/all/upcoming")
 	public List<SurveyVO> findAllSurveys() {
-		return surveyService.getAll();
+		return surveyService.getAllBeforeStartDate();
+	}
+	
+	@GetMapping("/survey/all/active")
+	public List<SurveyVO> findAllActiveSurveys() {
+		return surveyService.getAllBeforeEndDate();
 	}
 
 	@GetMapping("/survey/search")
@@ -42,7 +52,7 @@ public class AdminController {
 	}
 
 	@GetMapping("/survey/get")
-	public SurveyVO createSurvey(@RequestParam String surveyId) {
+	public SurveyVO getSurvey(@RequestParam String surveyId) {
 		return surveyService.findOne(surveyId);
 	}
 
@@ -59,5 +69,10 @@ public class AdminController {
 	@PostMapping("/survey/delete")
 	public Void deleteSurvey(@RequestBody SurveyVO surveyVO) {
 		return surveyService.delete(surveyVO);
+	}
+	
+	@GetMapping("/user/anylytics")
+	public AdminAnalyticsVO getAdminAnalytics() {
+		return adminService.getAdminAnalytics();
 	}
 }

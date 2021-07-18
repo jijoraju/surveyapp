@@ -144,6 +144,11 @@ public interface SurveyServiceHelper {
 	static Survey getSurveyFromSurveyVO(Survey survey, SurveyVO surveyVO) {
 		survey.setName(surveyVO.getName());
 		survey.setDescription(surveyVO.getDescription());
+		if (StringUtils.hasText(surveyVO.getStartDate())) {
+			survey.setStartDate(DateUtil.praseFromString(surveyVO.getStartDate(), "yyyy-MM-dd"));
+		}else {
+			survey.setStartDate(new Date());
+		}
 		if (StringUtils.hasText(surveyVO.getExpiryDate())) {
 			survey.setExpiryDate(DateUtil.praseFromString(surveyVO.getExpiryDate(), "yyyy-MM-dd"));
 		}
@@ -179,6 +184,7 @@ public interface SurveyServiceHelper {
 		surveyVO.setUniqueId(survey.getUniqueId());
 		surveyVO.setName(survey.getName());
 		surveyVO.setDescription(survey.getDescription());
+		surveyVO.setStartDate(DateUtil.toFormattedString(survey.getStartDate(), "yyyy-MM-dd"));
 		surveyVO.setExpiryDate(DateUtil.toFormattedString(survey.getExpiryDate(), "yyyy-MM-dd"));
 		surveyVO.setTags(survey.getTags().stream().collect(Collectors.joining(" ")));
 		surveyVO.setItems(getQuestionVOListFromQuestionList(survey.getQuestions()));

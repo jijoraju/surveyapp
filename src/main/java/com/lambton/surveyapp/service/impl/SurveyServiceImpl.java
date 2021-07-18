@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.management.RuntimeErrorException;
 
@@ -21,16 +20,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.lambton.surveyapp.db.entities.Survey;
 import com.lambton.surveyapp.db.entities.Tag;
+import com.lambton.surveyapp.db.entities.User;
 import com.lambton.surveyapp.db.query.CommonSearchSpecification;
 import com.lambton.surveyapp.db.query.SearchCriteria;
 import com.lambton.surveyapp.db.query.SearchOperation;
 import com.lambton.surveyapp.db.repository.SurveyRepository;
+import com.lambton.surveyapp.db.repository.SurveyResponseRepository;
 import com.lambton.surveyapp.db.repository.TagRepository;
 import com.lambton.surveyapp.service.SurveyService;
 import com.lambton.surveyapp.service.impl.helper.SurveyServiceHelper;
@@ -53,9 +55,27 @@ public class SurveyServiceImpl implements SurveyService {
 	@Autowired
 	private TagRepository tagRepository;
 
+	@Autowired
+	private SurveyResponseRepository surveyResponseRepository;
+
 	@Override
 	public List<SurveyVO> getAll() {
-		return SurveyServiceHelper.getSurveyVOListFromSurveyList(surveyRepository.findAll());
+		return null;
+	}
+
+	@Override
+	public List<SurveyVO> getAllBeforeEndDate() {
+		List<Survey> activeSurveys = surveyRepository.findAllBeforeEndDate(new Date());
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		List<Survey> unAttendedActiveSurveys = activeSurveys.stream()
+				.filter(activeSurvey -> !surveyResponseRepository.existsBySurveyAndUser(activeSurvey, user))
+				.collect(Collectors.toList());
+		return SurveyServiceHelper.getSurveyVOListFromSurveyList(unAttendedActiveSurveys);
+	}
+
+	@Override
+	public List<SurveyVO> getAllBeforeStartDate() {
+		return SurveyServiceHelper.getSurveyVOListFromSurveyList(surveyRepository.findAllBeforeStartDate(new Date()));
 	}
 
 	@Override

@@ -42,6 +42,8 @@ public class Survey extends BaseEntity {
 	@CurrentUser
 	private User createdBy;
 	
+	private Date startDate;
+	
 	private Date expiryDate;
 	
 	@ElementCollection
