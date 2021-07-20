@@ -40,6 +40,6 @@ public interface SurveyRepository extends JpaRepository<Survey, Long>, JpaSpecif
 	
 	Long countByStartDateBetween(Date today, Date sevenDayBefore);
 	
-	Long countByUpdatedTimeBetween(Calendar date, Calendar sevenDayBefore);	
+	Long countByUpdatedTimeBetween(Date date, Date sevenDayBefore);	
 	
 }

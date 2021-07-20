@@ -154,8 +154,8 @@ public class UserServiceImpl implements UserService {
 		sevenDaysBefore.add(Calendar.DAY_OF_MONTH, -7);
 
 		Long attendedSurveys = surveyResponseRepository.countByUser(user);
-		Long weeklyAttendedSurveys = surveyResponseRepository.countByUserAndUpdatedTimeBetween(user, today,
-				sevenDaysBefore);
+		Long weeklyAttendedSurveys = surveyResponseRepository.countByUserAndUpdatedTimeBetween(user, today.getTime(),
+				sevenDaysBefore.getTime());
 
 		userAnalyticsVO.setAttendedSurvey(attendedSurveys.toString());
 		userAnalyticsVO.setWeeklyAttendedSurvey(weeklyAttendedSurveys.toString());

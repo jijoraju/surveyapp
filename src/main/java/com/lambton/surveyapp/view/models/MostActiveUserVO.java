@@ -14,9 +14,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MostActiveUsersVO {
+public class MostActiveUserVO {
 	
 	private String user;
-	private String noOfSurveysAttended;
+	private Long noOfSurveysAttended;
 
 }

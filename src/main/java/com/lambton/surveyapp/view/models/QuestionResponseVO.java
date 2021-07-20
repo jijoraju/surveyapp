@@ -16,11 +16,18 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class QestionResponseVO {
-	
+public class QuestionResponseVO {
+
 	private String answerType;
+
 	private String questionId;
+
+	private QuestionVO question;
+
 	private String singleAnswer;
+
 	private List<String> multipleAnswer;
+
+	private List<String> answers;
 
 }

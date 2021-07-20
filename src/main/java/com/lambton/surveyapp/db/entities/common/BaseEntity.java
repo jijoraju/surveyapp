@@ -4,6 +4,7 @@
 package com.lambton.surveyapp.db.entities.common;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -38,9 +39,9 @@ public class BaseEntity {
 	
 	@CreationTimestamp
 	@Column(updatable = false)
-	private Calendar createdDate;
+	private Date createdDate;
 	
 	@UpdateTimestamp
-	private Calendar updatedTime;
+	private Date updatedTime;
 
 }

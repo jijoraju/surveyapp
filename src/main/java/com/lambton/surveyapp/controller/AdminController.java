@@ -71,7 +71,7 @@ public class AdminController {
 		return surveyService.delete(surveyVO);
 	}
 	
-	@GetMapping("/user/anylytics")
+	@GetMapping("/admin/anylytics")
 	public AdminAnalyticsVO getAdminAnalytics() {
 		return adminService.getAdminAnalytics();
 	}

@@ -12,7 +12,9 @@ import javax.persistence.Table;
 
 import com.lambton.surveyapp.db.entities.common.BaseEntity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -25,6 +27,8 @@ import lombok.Setter;
 @Table(name = "master_role")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Role extends BaseEntity implements Serializable {
 	
 	/**
