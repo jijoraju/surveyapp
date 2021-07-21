@@ -3,7 +3,6 @@
  */
 package com.lambton.surveyapp.db.entities.common;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.Column;
