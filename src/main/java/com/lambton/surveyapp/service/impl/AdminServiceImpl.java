@@ -50,10 +50,10 @@ public class AdminServiceImpl implements AdminService {
 		Calendar sevenDaysBefore = Calendar.getInstance();
 		sevenDaysBefore.add(Calendar.DAY_OF_MONTH, -7);
 		adminAnalyticsVO.setWeeklySurveys(
-				surveyRepository.countByUpdatedTimeBetween(today.getTime(), sevenDaysBefore.getTime()));
+				surveyRepository.countByUpdatedTimeBetween(sevenDaysBefore.getTime(), today.getTime()));
 		adminAnalyticsVO.setTotalActiveSurveys(surveyRepository.countAllBeforeEndDate(new Date()));
 		adminAnalyticsVO.setWeeklyActiveSurveys(
-				surveyRepository.countByStartDateBetween(today.getTime(), sevenDaysBefore.getTime()));
+				surveyRepository.countByStartDateBetween(sevenDaysBefore.getTime(), today.getTime()));
 		adminAnalyticsVO.setTotalUpcomingSurveys(surveyRepository.countAllBeforeStartDate(new Date()));
 		adminAnalyticsVO.setTotalSurveyResponses(surveyResponseRepository.count());
 		List<User> users = userRepository.findAll().stream()

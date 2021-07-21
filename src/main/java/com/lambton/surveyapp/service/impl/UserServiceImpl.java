@@ -154,8 +154,8 @@ public class UserServiceImpl implements UserService {
 		sevenDaysBefore.add(Calendar.DAY_OF_MONTH, -7);
 
 		Long attendedSurveys = surveyResponseRepository.countByUser(user);
-		Long weeklyAttendedSurveys = surveyResponseRepository.countByUserAndUpdatedTimeBetween(user, today.getTime(),
-				sevenDaysBefore.getTime());
+		Long weeklyAttendedSurveys = surveyResponseRepository.countByUserAndUpdatedTimeBetween(user,
+				sevenDaysBefore.getTime(), today.getTime());
 
 		userAnalyticsVO.setAttendedSurvey(attendedSurveys.toString());
 		userAnalyticsVO.setWeeklyAttendedSurvey(weeklyAttendedSurveys.toString());
@@ -168,7 +168,7 @@ public class UserServiceImpl implements UserService {
 				.collect(Collectors.toList());
 		userAnalyticsVO.setAvailableSurvey(String.valueOf(availbleSurveys.size()));
 		userAnalyticsVO.setWeeklyAvailableSurvey(
-				surveyRepository.countByStartDateBetween(today.getTime(), sevenDaysBefore.getTime()).toString());
+				surveyRepository.countByStartDateBetween(sevenDaysBefore.getTime(), today.getTime()).toString());
 
 		List<String> s = surveyResponseRepository.findByUser(user).stream()
 				.flatMap(res -> res.getSurvey().getTags().stream()).collect(Collectors.toList());

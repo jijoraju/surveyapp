@@ -29,7 +29,7 @@ public interface SurveyResponseRepository extends JpaRepository<SurveyResponse, 
 	
 	Long countByUser(User user);
 	
-    Long countByUserAndUpdatedTimeBetween(User user, Date today, Date sevenDaysBefore);
+    Long countByUserAndUpdatedTimeBetween(User user, Date sevenDaysBefore, Date today);
     
     @Query(value = "SELECT * FROM master_survey_response ORDER BY updated_time DESC LIMIT 5", nativeQuery = true)
 	List<SurveyResponse> findRecentRecords();

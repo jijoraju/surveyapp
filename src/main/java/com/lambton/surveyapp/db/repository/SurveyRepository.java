@@ -3,7 +3,6 @@
  */
 package com.lambton.surveyapp.db.repository;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -38,8 +37,8 @@ public interface SurveyRepository extends JpaRepository<Survey, Long>, JpaSpecif
 	@Query("select count(s) from Survey s where s.startDate <= ?1 and s.expiryDate >= ?1")
 	Long countAllBeforeEndDate(Date today);
 	
-	Long countByStartDateBetween(Date today, Date sevenDayBefore);
+	Long countByStartDateBetween(Date sevenDayBefore, Date today);
 	
-	Long countByUpdatedTimeBetween(Date date, Date sevenDayBefore);	
+	Long countByUpdatedTimeBetween(Date sevenDayBefore, Date today);	
 	
 }
