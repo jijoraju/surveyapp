@@ -44,7 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			// -- Swagger UI v3 (OpenAPI)
 			"/v3/api-docs/**", "/swagger-ui/**",
 			// other public endpoints
-			"/auth/login", "/auth/signup" };
+			"/auth/login", "/auth/signup", "/web/**", "/static/**", "/" };
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
