@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,7 @@ import com.lambton.surveyapp.service.AdminService;
 import com.lambton.surveyapp.service.SurveyService;
 import com.lambton.surveyapp.view.models.AdminAnalyticsVO;
 import com.lambton.surveyapp.view.models.SearchResultVO;
+import com.lambton.surveyapp.view.models.SurveyResponseVO;
 import com.lambton.surveyapp.view.models.SurveyVO;
 
 /**
@@ -27,12 +29,13 @@ import com.lambton.surveyapp.view.models.SurveyVO;
  */
 
 @RestController
+@CrossOrigin("http://surveyapp.ap-south-1.elasticbeanstalk.com")
 @RequestMapping("/surveyapp")
 public class AdminController {
-	
+
 	@Autowired
 	private SurveyService surveyService;
-	
+
 	@Autowired
 	private AdminService adminService;
 
@@ -40,10 +43,15 @@ public class AdminController {
 	public List<SurveyVO> findAllSurveys() {
 		return surveyService.getAllBeforeStartDate();
 	}
-	
+
 	@GetMapping("/survey/all/active")
 	public List<SurveyVO> findAllActiveSurveys() {
 		return surveyService.getAllBeforeEndDate();
+	}
+
+	@GetMapping("/survey/all")
+	public List<SurveyVO> findAll() {
+		return surveyService.getAll();
 	}
 
 	@GetMapping("/survey/search")
@@ -56,6 +64,11 @@ public class AdminController {
 		return surveyService.findOne(surveyId);
 	}
 
+	@GetMapping("/survey/getresponse")
+	public List<SurveyResponseVO> getSurveyResponses(@RequestParam String surveyId) {
+		return surveyService.findSurveyResponses(surveyId);
+	}
+
 	@PostMapping("/survey/create")
 	public SurveyVO createSurvey(@RequestBody SurveyVO surveyVO) {
 		return surveyService.save(surveyVO);
@@ -65,12 +78,12 @@ public class AdminController {
 	public SurveyVO updateSurvey(@RequestBody SurveyVO surveyVO) {
 		return surveyService.update(surveyVO);
 	}
-	
+
 	@PostMapping("/survey/delete")
 	public Void deleteSurvey(@RequestBody SurveyVO surveyVO) {
 		return surveyService.delete(surveyVO);
 	}
-	
+
 	@GetMapping("/admin/anylytics")
 	public AdminAnalyticsVO getAdminAnalytics() {
 		return adminService.getAdminAnalytics();

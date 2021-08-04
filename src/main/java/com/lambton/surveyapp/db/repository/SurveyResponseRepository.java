@@ -35,5 +35,7 @@ public interface SurveyResponseRepository extends JpaRepository<SurveyResponse, 
 	List<SurveyResponse> findRecentRecords();
     
     List<SurveyResponse> findByUpdatedTimeBetween(Date firstDate, Date secondDate);
-
+    
+    List<SurveyResponse> findAllBySurvey(Survey survey);
+    
 }
