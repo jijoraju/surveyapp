@@ -17,8 +17,10 @@ public class CORSConfiiguration implements WebMvcConfigurer {
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**").allowedOrigins("http://localhost:3000", "https://localhost:3000").allowedMethods("GET", "POST")
-				.allowedHeaders("*")
+		registry.addMapping("/**")
+				.allowedOrigins("http://localhost:3000", "https://localhost:3000",
+						"http://surveyapp.ap-south-1.elasticbeanstalk.com")
+				.allowedMethods("GET", "POST", "OPTIONS").allowedHeaders("*")
 				.exposedHeaders("Set-Cookie", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
 				.allowCredentials(true).maxAge(3600);
 	}

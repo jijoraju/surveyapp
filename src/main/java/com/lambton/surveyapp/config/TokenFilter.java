@@ -46,12 +46,10 @@ public class TokenFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-		if (!hasLength(token) || token.startsWith("Bearer ") || token.length() <= 7) {
-			Cookie c = WebUtils.getCookie(request, "JSESSIONID");
-			if (null != c && null != c.getValue()) {
-				token = c.getValue();
-			}
-		}
+		/*
+		 * if (!hasLength(token) || token.startsWith("Bearer ") || token.length() <= 7) { Cookie c =
+		 * WebUtils.getCookie(request, "JSESSIONID"); if (null != c && null != c.getValue()) { token = c.getValue(); } }
+		 */
 		if(!hasLength(token)) {
 			filterChain.doFilter(request, response);
 			return;

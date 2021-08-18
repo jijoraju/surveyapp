@@ -13,7 +13,9 @@ spring:
     username: survey_app_admin
     password: SurveyAdminApp12345
     url: jdbc:mysql://survey-app.cqh0az309wia.ap-south-1.rds.amazonaws.com:3306/survey-app?useSSL=false
-    
+  mvc:
+    view:      prefix: /WEB-INF/views/
+      suffix: .jsp
   jpa:
     hibernate:
       ddl-auto: update

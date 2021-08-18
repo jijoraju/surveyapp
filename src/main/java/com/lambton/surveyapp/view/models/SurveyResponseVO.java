@@ -18,9 +18,13 @@ import lombok.Setter;
 public class SurveyResponseVO {
 
 	private String userId;
+	
+	private UserVO user;
 
 	private String surveyId;
+	
+	private SurveyVO survey;
 
-	private List<QestionResponseVO> responses;
+	private List<QuestionResponseVO> responses;
 
 }

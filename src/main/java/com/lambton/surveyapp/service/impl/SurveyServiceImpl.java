@@ -35,9 +35,11 @@ import com.lambton.surveyapp.db.repository.SurveyRepository;
 import com.lambton.surveyapp.db.repository.SurveyResponseRepository;
 import com.lambton.surveyapp.db.repository.TagRepository;
 import com.lambton.surveyapp.service.SurveyService;
+import com.lambton.surveyapp.service.impl.helper.AdminServiceHelper;
 import com.lambton.surveyapp.service.impl.helper.SurveyServiceHelper;
 import com.lambton.surveyapp.util.DateUtil;
 import com.lambton.surveyapp.view.models.SearchResultVO;
+import com.lambton.surveyapp.view.models.SurveyResponseVO;
 import com.lambton.surveyapp.view.models.SurveyVO;
 
 /**
@@ -60,7 +62,7 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Override
 	public List<SurveyVO> getAll() {
-		return null;
+		return SurveyServiceHelper.getSurveyVOListFromSurveyList(surveyRepository.findAll());
 	}
 
 	@Override
@@ -204,6 +206,14 @@ public class SurveyServiceImpl implements SurveyService {
 			return existingTags.stream().map(Tag::getName).collect(Collectors.toList());
 		}
 		return Collections.emptyList();
+	}
+
+	@Override
+	public List<SurveyResponseVO> findSurveyResponses(String surveyId) {
+		Survey survey = surveyRepository.findByUniqueId(surveyId)
+				.orElseThrow(() -> new RuntimeErrorException(new Error("Update failed")));
+		return AdminServiceHelper
+				.getSurveyResponseVOFromServeyResponse(surveyResponseRepository.findAllBySurvey(survey));
 	}
 
 }

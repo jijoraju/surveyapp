@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ import com.lambton.surveyapp.view.models.SignUpResponse;
  *
  */
 @RestController
+@CrossOrigin("http://surveyapp.ap-south-1.elasticbeanstalk.com")
 @RequestMapping("/auth")
 public class AuthController {
 

@@ -5,8 +5,6 @@ package com.lambton.surveyapp.view.models;
 
 import java.util.List;
 
-import com.lambton.surveyapp.db.entities.SurveyResponse;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,8 +27,8 @@ public class AdminAnalyticsVO {
 	private Long totalUsers;
 	private Long newUsers;
 	
-	List<SurveyResponse> recentSurveys;
+	List<SurveyResponseVO> recentSurveys;
 	List<WeeklyUserSurveyDataVO> weeklyUserSurveyData;
-	List<MostActiveUsersVO> mostActiveUsers;
+	List<MostActiveUserVO> mostActiveUsers;
 	
 }
